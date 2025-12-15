@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Calendar, Users, User, Building2, MapPin, Edit, Plus, BookOpen, GraduationCap } from "lucide-react";
+import { ArrowLeft, Calendar, Users, User, Building2, MapPin, Edit, Plus, BookOpen, GraduationCap, UserPlus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useBatches, Trainee } from "@/context/BatchContext";
@@ -14,6 +14,7 @@ import TraineeListSection from "@/components/TraineeListSection";
 import ScheduleStatusDialog from "@/components/ScheduleStatusDialog";
 import AddTrainerDialog from "@/components/AddTrainerDialog";
 import TrainerContributionDialog from "@/components/TrainerContributionDialog";
+import MilestoneDatesSection from "@/components/MilestoneDatesSection";
 
 const BatchDetail = () => {
   const { id } = useParams();
@@ -26,21 +27,19 @@ const BatchDetail = () => {
     name: string;
     role: string;
     hours: number;
-    rate: number;
-  }>({ open: false, name: "", role: "", hours: 0, rate: 0 });
+  }>({ open: false, name: "", role: "", hours: 0 });
   const [qualifierDialog, setQualifierDialog] = useState(false);
   const [editDialog, setEditDialog] = useState(false);
   const [scheduleDialog, setScheduleDialog] = useState(false);
   const [addTrainerDialog, setAddTrainerDialog] = useState<{
     open: boolean;
-    type: "trainer" | "behavioralTrainer" | "mentor";
+    type: "trainer" | "behavioralTrainer" | "mentor" | "buddyMentor";
   }>({ open: false, type: "trainer" });
   const [contributionDialog, setContributionDialog] = useState<{
     open: boolean;
     name: string;
     role: string;
-    hourlyRate: number;
-  }>({ open: false, name: "", role: "", hourlyRate: 0 });
+  }>({ open: false, name: "", role: "" });
 
   useEffect(() => {
     const isAuth = localStorage.getItem("isAuthenticated");
@@ -60,20 +59,20 @@ const BatchDetail = () => {
     );
   }
 
-  const handleStakeholderClick = (type: 'trainer' | 'behavioralTrainer' | 'mentor') => {
-    if (batch.stakeholders) {
+  const handleStakeholderClick = (type: 'trainer' | 'behavioralTrainer' | 'mentor' | 'buddyMentor') => {
+    if (batch.stakeholders && batch.stakeholders[type]) {
       const stakeholder = batch.stakeholders[type];
-      const roleNames = {
+      const roleNames: Record<string, string> = {
         trainer: "Trainer",
         behavioralTrainer: "Behavioral Trainer",
-        mentor: "Mentor"
+        mentor: "Mentor",
+        buddyMentor: "Buddy Mentor"
       };
       setStakeholderDialog({
         open: true,
         name: stakeholder.name,
         role: roleNames[type],
         hours: stakeholder.hours,
-        rate: stakeholder.hourlyRate,
       });
     }
   };
@@ -87,7 +86,6 @@ const BatchDetail = () => {
   };
 
   const handleAddTrainer = (trainerData: { name: string; type: string; category: "internal" | "external"; hourlyRate: number }) => {
-    // Update the batch with new trainer info
     const trainerType = addTrainerDialog.type;
     const updates: Partial<typeof batch> = {};
     
@@ -105,7 +103,6 @@ const BatchDetail = () => {
         [trainerType]: {
           name: trainerData.name,
           hours: 0,
-          hourlyRate: trainerData.hourlyRate,
         },
       };
     }
@@ -113,49 +110,51 @@ const BatchDetail = () => {
     updateBatch(batch.id, updates);
   };
 
-  const handleViewContributions = (type: 'trainer' | 'behavioralTrainer' | 'mentor') => {
-    if (batch.stakeholders) {
+  const handleViewContributions = (type: 'trainer' | 'behavioralTrainer' | 'mentor' | 'buddyMentor') => {
+    if (batch.stakeholders && batch.stakeholders[type]) {
       const stakeholder = batch.stakeholders[type];
-      const roleNames = {
+      const roleNames: Record<string, string> = {
         trainer: "Trainer",
         behavioralTrainer: "Behavioral Trainer",
-        mentor: "Mentor"
+        mentor: "Mentor",
+        buddyMentor: "Buddy Mentor"
       };
       setContributionDialog({
         open: true,
         name: stakeholder.name,
         role: roleNames[type],
-        hourlyRate: stakeholder.hourlyRate,
       });
     }
   };
 
+  const buddyMentor = (batch as any).buddyMentor || "Not Assigned";
+
   return (
     <>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
         {/* Header */}
-        <header className="border-b bg-card shadow-sm">
+        <header className="border-b bg-card/80 backdrop-blur-sm shadow-sm sticky top-0 z-10">
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between mb-4">
-              <Button variant="ghost" onClick={() => navigate("/dashboard")} className="gap-2">
+              <Button variant="ghost" onClick={() => navigate("/dashboard")} className="gap-2 hover:bg-primary/10">
                 <ArrowLeft className="w-4 h-4" />
                 Back to Dashboard
               </Button>
-              <Button variant="outline" onClick={() => setEditDialog(true)} className="gap-2">
+              <Button variant="outline" onClick={() => setEditDialog(true)} className="gap-2 hover:border-primary hover:text-primary transition-all">
                 <Edit className="w-4 h-4" />
                 Edit Details
               </Button>
             </div>
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <h1 className="text-2xl font-bold text-foreground">{batch.name}</h1>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">{batch.name}</h1>
                 {batch.status === "graduated" ? (
                   <Badge className="bg-success/10 text-success border border-success/20">
                     <GraduationCap className="w-3 h-3 mr-1" />
                     Graduated
                   </Badge>
                 ) : (
-                  <Badge className="bg-primary/10 text-primary border border-primary/20">
+                  <Badge className="bg-primary/10 text-primary border border-primary/20 animate-pulse-glow">
                     <BookOpen className="w-3 h-3 mr-1" />
                     Ongoing Training
                   </Badge>
@@ -163,7 +162,7 @@ const BatchDetail = () => {
               </div>
               <p className="text-muted-foreground">{batch.description}</p>
               {batch.currentWeek && (
-                <p className="text-sm text-primary mt-1">
+                <p className="text-sm text-primary mt-1 font-medium">
                   Week {batch.currentWeek} of {batch.totalWeeks || "N/A"}
                 </p>
               )}
@@ -175,31 +174,31 @@ const BatchDetail = () => {
         <main className="container mx-auto px-4 py-8">
           {/* Room Details */}
           {batch.roomDetails && (
-            <Card className="mb-8 animate-fade-in">
-              <CardHeader>
+            <Card className="mb-8 animate-fade-in overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-primary/5 to-info/5 border-b">
                 <CardTitle className="flex items-center gap-2">
-                  <Building2 className="w-5 h-5" />
+                  <Building2 className="w-5 h-5 text-primary" />
                   Training Room Details
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
+                  <div className="flex items-center gap-2 p-3 bg-gradient-to-br from-muted to-muted/50 rounded-lg border transition-all hover:border-primary/30">
                     <Building2 className="w-5 h-5 text-primary" />
                     <div>
                       <p className="text-xs text-muted-foreground">Building</p>
                       <p className="font-semibold">{batch.roomDetails.building}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
-                    <MapPin className="w-5 h-5 text-primary" />
+                  <div className="flex items-center gap-2 p-3 bg-gradient-to-br from-muted to-muted/50 rounded-lg border transition-all hover:border-info/30">
+                    <MapPin className="w-5 h-5 text-info" />
                     <div>
                       <p className="text-xs text-muted-foreground">Floor</p>
                       <p className="font-semibold">Floor {batch.roomDetails.floor}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
-                    <MapPin className="w-5 h-5 text-primary" />
+                  <div className="flex items-center gap-2 p-3 bg-gradient-to-br from-muted to-muted/50 rounded-lg border transition-all hover:border-success/30">
+                    <MapPin className="w-5 h-5 text-success" />
                     <div>
                       <p className="text-xs text-muted-foreground">Room Number</p>
                       <p className="font-semibold">{batch.roomDetails.odcNumber}</p>
@@ -210,87 +209,81 @@ const BatchDetail = () => {
             </Card>
           )}
 
-          {/* Metadata Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <Card className="animate-fade-in cursor-pointer card-hover" onClick={() => handleViewContributions('trainer')}>
+          {/* Trainer Cards - Updated with Buddy Mentor */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+            <Card className="animate-fade-in cursor-pointer card-hover bg-gradient-to-br from-card to-primary/5 border-primary/10" onClick={() => handleViewContributions('trainer')}>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center justify-between">
                   <span className="flex items-center gap-2">
-                    <User className="w-4 h-4" />
+                    <User className="w-4 h-4 text-primary" />
                     Trainer
                   </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 w-7 p-0"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setAddTrainerDialog({ open: true, type: "trainer" });
-                    }}
-                  >
+                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-primary/20" onClick={(e) => { e.stopPropagation(); setAddTrainerDialog({ open: true, type: "trainer" }); }}>
                     <Plus className="w-4 h-4" />
                   </Button>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-xl font-semibold hover:text-primary transition-colors">{batch.trainer}</p>
-                <p className="text-xs text-muted-foreground mt-1">Click to view contributions</p>
+                <p className="text-lg font-semibold text-primary">{batch.trainer}</p>
+                <p className="text-xs text-muted-foreground mt-1">Click to view</p>
               </CardContent>
             </Card>
 
-            <Card className="animate-fade-in cursor-pointer card-hover" style={{ animationDelay: "0.1s" }} onClick={() => handleViewContributions('behavioralTrainer')}>
+            <Card className="animate-fade-in cursor-pointer card-hover bg-gradient-to-br from-card to-info/5 border-info/10" style={{ animationDelay: "0.1s" }} onClick={() => handleViewContributions('behavioralTrainer')}>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center justify-between">
                   <span className="flex items-center gap-2">
-                    <User className="w-4 h-4" />
-                    Behavioral Trainer
+                    <User className="w-4 h-4 text-info" />
+                    BH Trainer
                   </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 w-7 p-0"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setAddTrainerDialog({ open: true, type: "behavioralTrainer" });
-                    }}
-                  >
+                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-info/20" onClick={(e) => { e.stopPropagation(); setAddTrainerDialog({ open: true, type: "behavioralTrainer" }); }}>
                     <Plus className="w-4 h-4" />
                   </Button>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-xl font-semibold hover:text-primary transition-colors">{batch.behavioralTrainer}</p>
-                <p className="text-xs text-muted-foreground mt-1">Click to view contributions</p>
+                <p className="text-lg font-semibold text-info">{batch.behavioralTrainer}</p>
+                <p className="text-xs text-muted-foreground mt-1">Click to view</p>
               </CardContent>
             </Card>
 
-            <Card className="animate-fade-in cursor-pointer card-hover" style={{ animationDelay: "0.2s" }} onClick={() => handleViewContributions('mentor')}>
+            <Card className="animate-fade-in cursor-pointer card-hover bg-gradient-to-br from-card to-success/5 border-success/10" style={{ animationDelay: "0.2s" }} onClick={() => handleViewContributions('mentor')}>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center justify-between">
                   <span className="flex items-center gap-2">
-                    <User className="w-4 h-4" />
+                    <User className="w-4 h-4 text-success" />
                     Mentor
                   </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 w-7 p-0"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setAddTrainerDialog({ open: true, type: "mentor" });
-                    }}
-                  >
+                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-success/20" onClick={(e) => { e.stopPropagation(); setAddTrainerDialog({ open: true, type: "mentor" }); }}>
                     <Plus className="w-4 h-4" />
                   </Button>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-xl font-semibold hover:text-primary transition-colors">{batch.mentor}</p>
-                <p className="text-xs text-muted-foreground mt-1">Click to view contributions</p>
+                <p className="text-lg font-semibold text-success">{batch.mentor}</p>
+                <p className="text-xs text-muted-foreground mt-1">Click to view</p>
               </CardContent>
             </Card>
 
-            <Card className="animate-fade-in" style={{ animationDelay: "0.3s" }}>
+            <Card className="animate-fade-in cursor-pointer card-hover bg-gradient-to-br from-card to-warning/5 border-warning/10" style={{ animationDelay: "0.25s" }} onClick={() => handleViewContributions('buddyMentor')}>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center justify-between">
+                  <span className="flex items-center gap-2">
+                    <UserPlus className="w-4 h-4 text-warning" />
+                    Buddy Mentor
+                  </span>
+                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-warning/20" onClick={(e) => { e.stopPropagation(); setAddTrainerDialog({ open: true, type: "buddyMentor" as any }); }}>
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-lg font-semibold text-warning">{buddyMentor}</p>
+                <p className="text-xs text-muted-foreground mt-1">Click to view</p>
+              </CardContent>
+            </Card>
+
+            <Card className="animate-fade-in bg-gradient-to-br from-card to-muted" style={{ animationDelay: "0.3s" }}>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
@@ -307,45 +300,35 @@ const BatchDetail = () => {
 
           {/* Progress Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <Card 
-              className="animate-fade-in cursor-pointer card-hover" 
-              style={{ animationDelay: "0.4s" }}
-              onClick={() => setScheduleDialog(true)}
-            >
-              <CardHeader>
+            <Card className="animate-fade-in cursor-pointer card-hover" style={{ animationDelay: "0.4s" }} onClick={() => setScheduleDialog(true)}>
+              <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent border-b">
                 <CardTitle className="flex items-center gap-2">
-                  <Users className="w-5 h-5" />
+                  <Users className="w-5 h-5 text-primary" />
                   Schedule Status Distribution
                 </CardTitle>
                 <p className="text-xs text-muted-foreground">Click to view detailed breakdown</p>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-4">
                 <ProgressChart data={batch.scheduleStatus} />
               </CardContent>
             </Card>
 
             <Card className="animate-fade-in" style={{ animationDelay: "0.5s" }}>
-              <CardHeader>
+              <CardHeader className="bg-gradient-to-r from-info/5 to-transparent border-b">
                 <CardTitle>Quick Stats</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between items-center p-3 bg-success/10 rounded-lg">
+              <CardContent className="space-y-4 pt-4">
+                <div className="flex justify-between items-center p-3 bg-gradient-to-r from-success/10 to-success/5 rounded-lg border border-success/20 transition-all hover:border-success/40">
                   <span className="text-sm font-medium">On Schedule</span>
-                  <span className="text-2xl font-bold text-success">
-                    {batch.scheduleStatus.onSchedule}
-                  </span>
+                  <span className="text-2xl font-bold text-success">{batch.scheduleStatus.onSchedule}</span>
                 </div>
-                <div className="flex justify-between items-center p-3 bg-warning/10 rounded-lg">
+                <div className="flex justify-between items-center p-3 bg-gradient-to-r from-warning/10 to-warning/5 rounded-lg border border-warning/20 transition-all hover:border-warning/40">
                   <span className="text-sm font-medium">Behind Schedule</span>
-                  <span className="text-2xl font-bold text-warning">
-                    {batch.scheduleStatus.behind}
-                  </span>
+                  <span className="text-2xl font-bold text-warning">{batch.scheduleStatus.behind}</span>
                 </div>
-                <div className="flex justify-between items-center p-3 bg-info/10 rounded-lg">
+                <div className="flex justify-between items-center p-3 bg-gradient-to-r from-info/10 to-info/5 rounded-lg border border-info/20 transition-all hover:border-info/40">
                   <span className="text-sm font-medium">Advanced</span>
-                  <span className="text-2xl font-bold text-info">
-                    {batch.scheduleStatus.advanced}
-                  </span>
+                  <span className="text-2xl font-bold text-info">{batch.scheduleStatus.advanced}</span>
                 </div>
                 <div className="pt-3 border-t">
                   <div className="flex justify-between items-center">
@@ -354,11 +337,7 @@ const BatchDetail = () => {
                   </div>
                 </div>
                 {batch.milestones.qualifier.completed && batch.qualifierScores && (
-                  <Button 
-                    variant="outline" 
-                    className="w-full mt-4"
-                    onClick={() => setQualifierDialog(true)}
-                  >
+                  <Button variant="outline" className="w-full mt-4 hover:border-primary hover:text-primary" onClick={() => setQualifierDialog(true)}>
                     View Qualifier Scores
                   </Button>
                 )}
@@ -366,13 +345,14 @@ const BatchDetail = () => {
             </Card>
           </div>
 
+          {/* Milestone Dates Section */}
+          <div className="mb-8">
+            <MilestoneDatesSection batchId={batch.id} milestones={batch.milestones} />
+          </div>
+
           {/* Trainee List Section */}
           <div className="mb-8">
-            <TraineeListSection
-              batchId={batch.id}
-              trainees={batch.trainees || []}
-              onAddTrainee={handleAddTrainee}
-            />
+            <TraineeListSection batchId={batch.id} trainees={batch.trainees || []} onAddTrainee={handleAddTrainee} />
           </div>
 
           {/* Attendance Section */}
@@ -386,46 +366,19 @@ const BatchDetail = () => {
         name={stakeholderDialog.name}
         role={stakeholderDialog.role}
         contributionHours={stakeholderDialog.hours}
-        hourlyRate={stakeholderDialog.rate}
       />
 
       {batch.qualifierScores && (
-        <QualifierDialog
-          open={qualifierDialog}
-          onOpenChange={setQualifierDialog}
-          batchName={batch.name}
-          qualifierScores={batch.qualifierScores}
-        />
+        <QualifierDialog open={qualifierDialog} onOpenChange={setQualifierDialog} batchName={batch.name} qualifierScores={batch.qualifierScores} />
       )}
 
-      <EditBatchDialog
-        open={editDialog}
-        onOpenChange={setEditDialog}
-        batch={batch}
-        onSave={handleSaveBatch}
-      />
+      <EditBatchDialog open={editDialog} onOpenChange={setEditDialog} batch={batch} onSave={handleSaveBatch} />
 
-      <ScheduleStatusDialog
-        open={scheduleDialog}
-        onOpenChange={setScheduleDialog}
-        trainees={batch.trainees || []}
-        scheduleStatus={batch.scheduleStatus}
-      />
+      <ScheduleStatusDialog open={scheduleDialog} onOpenChange={setScheduleDialog} trainees={batch.trainees || []} scheduleStatus={batch.scheduleStatus} />
 
-      <AddTrainerDialog
-        open={addTrainerDialog.open}
-        onOpenChange={(open) => setAddTrainerDialog({ ...addTrainerDialog, open })}
-        onSave={handleAddTrainer}
-        trainerType={addTrainerDialog.type}
-      />
+      <AddTrainerDialog open={addTrainerDialog.open} onOpenChange={(open) => setAddTrainerDialog({ ...addTrainerDialog, open })} onSave={handleAddTrainer} trainerType={addTrainerDialog.type} />
 
-      <TrainerContributionDialog
-        open={contributionDialog.open}
-        onOpenChange={(open) => setContributionDialog({ ...contributionDialog, open })}
-        name={contributionDialog.name}
-        role={contributionDialog.role}
-        hourlyRate={contributionDialog.hourlyRate}
-      />
+      <TrainerContributionDialog open={contributionDialog.open} onOpenChange={(open) => setContributionDialog({ ...contributionDialog, open })} name={contributionDialog.name} role={contributionDialog.role} />
     </>
   );
 };
