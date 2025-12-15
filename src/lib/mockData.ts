@@ -7,9 +7,12 @@ export const mockBatches = [
     trainer: "John Smith",
     behavioralTrainer: "Sarah Johnson",
     mentor: "Michael Brown",
+    buddyMentor: "Alex Turner",
     startDate: "Jan 15, 2024",
     endDate: "Apr 15, 2024",
     status: "active",
+    currentWeek: 8,
+    totalWeeks: 12,
     scheduleStatus: {
       onSchedule: 18,
       behind: 8,
@@ -26,9 +29,10 @@ export const mockBatches = [
       odcNumber: "ODC-301",
     },
     stakeholders: {
-      trainer: { name: "John Smith", hours: 120, hourlyRate: 500 },
-      behavioralTrainer: { name: "Sarah Johnson", hours: 80, hourlyRate: 450 },
-      mentor: { name: "Michael Brown", hours: 100, hourlyRate: 600 },
+      trainer: { name: "John Smith", hours: 120 },
+      behavioralTrainer: { name: "Sarah Johnson", hours: 80 },
+      mentor: { name: "Michael Brown", hours: 100 },
+      buddyMentor: { name: "Alex Turner", hours: 60 },
     },
     qualifierScores: {
       average: 78,
@@ -36,6 +40,13 @@ export const mockBatches = [
       lowest: 62,
       passRate: 85,
     },
+    trainees: [
+      { id: "t1", name: "Rahul Kumar", email: "rahul.k@company.com", employeeId: "EMP001", scheduleAdherence: "On Schedule", learningStatus: "In Progress", interimStatus: "Completed", finalStatus: "Pending", qualifierScore: 85, eligibility: "Eligible" },
+      { id: "t2", name: "Priya Sharma", email: "priya.s@company.com", employeeId: "EMP002", scheduleAdherence: "Advanced", learningStatus: "Completed", interimStatus: "Completed", finalStatus: "Pending", qualifierScore: 92, eligibility: "Eligible" },
+      { id: "t3", name: "Amit Patel", email: "amit.p@company.com", employeeId: "EMP003", scheduleAdherence: "Behind Schedule", learningStatus: "In Progress", interimStatus: "In Progress", finalStatus: "Pending", qualifierScore: 68, eligibility: "Eligible" },
+      { id: "t4", name: "Sneha Reddy", email: "sneha.r@company.com", employeeId: "EMP004", scheduleAdherence: "On Schedule", learningStatus: "In Progress", interimStatus: "Completed", finalStatus: "Pending", qualifierScore: 78, eligibility: "Eligible" },
+      { id: "t5", name: "Vikram Singh", email: "vikram.s@company.com", employeeId: "EMP005", scheduleAdherence: "On Schedule", learningStatus: "Completed", interimStatus: "Completed", finalStatus: "Pending", qualifierScore: 88, eligibility: "Eligible" },
+    ],
   },
   {
     id: "batch-2",
@@ -45,9 +56,12 @@ export const mockBatches = [
     trainer: "Emily Davis",
     behavioralTrainer: "Robert Wilson",
     mentor: "Jessica Martinez",
+    buddyMentor: "Kevin Lee",
     startDate: "Feb 1, 2024",
     endDate: "May 1, 2024",
     status: "graduated",
+    currentWeek: 12,
+    totalWeeks: 12,
     scheduleStatus: {
       onSchedule: 25,
       behind: 0,
@@ -64,9 +78,10 @@ export const mockBatches = [
       odcNumber: "ODC-502",
     },
     stakeholders: {
-      trainer: { name: "Emily Davis", hours: 150, hourlyRate: 550 },
-      behavioralTrainer: { name: "Robert Wilson", hours: 90, hourlyRate: 450 },
-      mentor: { name: "Jessica Martinez", hours: 110, hourlyRate: 650 },
+      trainer: { name: "Emily Davis", hours: 150 },
+      behavioralTrainer: { name: "Robert Wilson", hours: 90 },
+      mentor: { name: "Jessica Martinez", hours: 110 },
+      buddyMentor: { name: "Kevin Lee", hours: 75 },
     },
     qualifierScores: {
       average: 82,
@@ -74,6 +89,10 @@ export const mockBatches = [
       lowest: 70,
       passRate: 92,
     },
+    trainees: [
+      { id: "t6", name: "Ananya Gupta", email: "ananya.g@company.com", employeeId: "EMP006", scheduleAdherence: "On Schedule", learningStatus: "Completed", interimStatus: "Completed", finalStatus: "Completed", qualifierScore: 90, eligibility: "Eligible" },
+      { id: "t7", name: "Rohan Mehta", email: "rohan.m@company.com", employeeId: "EMP007", scheduleAdherence: "On Schedule", learningStatus: "Completed", interimStatus: "Completed", finalStatus: "Completed", qualifierScore: 85, eligibility: "Eligible" },
+    ],
   },
   {
     id: "batch-3",
@@ -83,9 +102,12 @@ export const mockBatches = [
     trainer: "David Lee",
     behavioralTrainer: "Amanda White",
     mentor: "Chris Anderson",
+    buddyMentor: "Sophia Chen",
     startDate: "Jan 20, 2024",
     endDate: "Apr 20, 2024",
     status: "active",
+    currentWeek: 6,
+    totalWeeks: 12,
     scheduleStatus: {
       onSchedule: 20,
       behind: 5,
@@ -102,9 +124,10 @@ export const mockBatches = [
       odcNumber: "ODC-204",
     },
     stakeholders: {
-      trainer: { name: "David Lee", hours: 130, hourlyRate: 520 },
-      behavioralTrainer: { name: "Amanda White", hours: 85, hourlyRate: 460 },
-      mentor: { name: "Chris Anderson", hours: 105, hourlyRate: 580 },
+      trainer: { name: "David Lee", hours: 130 },
+      behavioralTrainer: { name: "Amanda White", hours: 85 },
+      mentor: { name: "Chris Anderson", hours: 105 },
+      buddyMentor: { name: "Sophia Chen", hours: 55 },
     },
     qualifierScores: {
       average: 75,
@@ -112,5 +135,10 @@ export const mockBatches = [
       lowest: 58,
       passRate: 80,
     },
+    trainees: [
+      { id: "t8", name: "Karan Verma", email: "karan.v@company.com", employeeId: "EMP008", scheduleAdherence: "Behind Schedule", learningStatus: "In Progress", interimStatus: "Pending", finalStatus: "Pending", qualifierScore: 72, eligibility: "Eligible" },
+      { id: "t9", name: "Divya Nair", email: "divya.n@company.com", employeeId: "EMP009", scheduleAdherence: "Advanced", learningStatus: "In Progress", interimStatus: "Pending", finalStatus: "Pending", qualifierScore: 88, eligibility: "Eligible" },
+      { id: "t10", name: "Arjun Rao", email: "arjun.r@company.com", employeeId: "EMP010", scheduleAdherence: "On Schedule", learningStatus: "In Progress", interimStatus: "Pending", finalStatus: "Pending", qualifierScore: 76, eligibility: "Eligible" },
+    ],
   },
 ];

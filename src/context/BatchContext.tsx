@@ -43,9 +43,10 @@ export interface Batch {
     odcNumber: string;
   };
   stakeholders?: {
-    trainer: { name: string; hours: number; hourlyRate: number };
-    behavioralTrainer: { name: string; hours: number; hourlyRate: number };
-    mentor: { name: string; hours: number; hourlyRate: number };
+    trainer: { name: string; hours: number };
+    behavioralTrainer: { name: string; hours: number };
+    mentor: { name: string; hours: number };
+    buddyMentor?: { name: string; hours: number };
   };
   qualifierScores?: {
     average: number;
