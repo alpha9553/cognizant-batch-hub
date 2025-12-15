@@ -11,7 +11,7 @@ interface AddTrainerDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: (trainer: { name: string; type: string; category: "internal" | "external"; hourlyRate: number }) => void;
-  trainerType: "trainer" | "behavioralTrainer" | "mentor";
+  trainerType: "trainer" | "behavioralTrainer" | "mentor" | "buddyMentor";
 }
 
 const AddTrainerDialog = ({ open, onOpenChange, onSave, trainerType }: AddTrainerDialogProps) => {
@@ -20,10 +20,11 @@ const AddTrainerDialog = ({ open, onOpenChange, onSave, trainerType }: AddTraine
   const [category, setCategory] = useState<"internal" | "external">("internal");
   const [hourlyRate, setHourlyRate] = useState("");
 
-  const trainerTypeLabels = {
+  const trainerTypeLabels: Record<string, string> = {
     trainer: "Trainer",
     behavioralTrainer: "Behavioral Trainer",
     mentor: "Mentor",
+    buddyMentor: "Buddy Mentor",
   };
 
   const handleSave = () => {
