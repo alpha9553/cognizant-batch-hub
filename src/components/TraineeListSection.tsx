@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Users, Plus, Search, ChevronDown, ChevronUp, Eye } from "lucide-react";
 import { Trainee } from "@/context/BatchContext";
+import { useAttendance } from "@/context/AttendanceContext";
 import AddTraineeDialog from "./AddTraineeDialog";
 import TraineeDetailsDialog from "./TraineeDetailsDialog";
 import AttendanceViewDialog from "./AttendanceViewDialog";
@@ -24,6 +25,7 @@ const TraineeListSection = ({ batchId, trainees, onAddTrainee }: TraineeListSect
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [showAttendanceDialog, setShowAttendanceDialog] = useState(false);
   const [attendanceTrainee, setAttendanceTrainee] = useState<Trainee | null>(null);
+  const { hasAttendanceData } = useAttendance();
 
   const filteredTrainees = trainees.filter(
     (t) =>
@@ -60,18 +62,18 @@ const TraineeListSection = ({ batchId, trainees, onAddTrainee }: TraineeListSect
 
   return (
     <>
-      <Card className="animate-fade-in overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-primary/5 to-info/5 border-b">
+      <Card className="animate-fade-in overflow-hidden border-l-4 border-l-info">
+        <CardHeader className="bg-gradient-to-r from-info/10 via-primary/5 to-transparent border-b">
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <Users className="w-5 h-5 text-primary" />
+            <CardTitle className="flex items-center gap-2 text-info">
+              <Users className="w-5 h-5" />
               Trainees ({trainees.length})
             </CardTitle>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={() => setIsExpanded(!isExpanded)} className="hover:border-primary">
+              <Button variant="outline" size="sm" onClick={() => setIsExpanded(!isExpanded)} className="hover:border-info">
                 {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
               </Button>
-              <Button size="sm" onClick={() => setShowAddDialog(true)} className="bg-gradient-to-r from-primary to-info hover:opacity-90">
+              <Button size="sm" onClick={() => setShowAddDialog(true)} className="bg-gradient-to-r from-info to-primary hover:opacity-90">
                 <Plus className="w-4 h-4 mr-1" />
                 Add Trainee
               </Button>
@@ -87,7 +89,7 @@ const TraineeListSection = ({ batchId, trainees, onAddTrainee }: TraineeListSect
                   placeholder="Search by name, email, or ID..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 transition-all focus:ring-2 focus:ring-primary/20"
+                  className="pl-10 transition-all focus:ring-2 focus:ring-info/20"
                 />
               </div>
             </div>
@@ -96,7 +98,7 @@ const TraineeListSection = ({ batchId, trainees, onAddTrainee }: TraineeListSect
               <div className="rounded-md border overflow-hidden">
                 <Table>
                   <TableHeader>
-                    <TableRow className="bg-muted/50">
+                    <TableRow className="bg-gradient-to-r from-muted/80 to-muted/40">
                       <TableHead>Name</TableHead>
                       <TableHead>Employee ID</TableHead>
                       <TableHead>Schedule Status</TableHead>
@@ -109,74 +111,83 @@ const TraineeListSection = ({ batchId, trainees, onAddTrainee }: TraineeListSect
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredTrainees.map((trainee, index) => (
-                      <TableRow
-                        key={trainee.id}
-                        className="cursor-pointer hover:bg-muted/50 animate-fade-in transition-colors"
-                        style={{ animationDelay: `${index * 0.03}s` }}
-                      >
-                        <TableCell>
-                          <button
-                            onClick={(e) => handleNameClick(e, trainee)}
-                            className="text-left hover:text-primary transition-colors"
-                          >
-                            <p className="font-medium hover:underline">{trainee.name}</p>
-                            <p className="text-xs text-muted-foreground">{trainee.email}</p>
-                          </button>
-                        </TableCell>
-                        <TableCell className="font-mono text-sm">{trainee.employeeId}</TableCell>
-                        <TableCell>
-                          <Badge className={getStatusBadge(trainee.scheduleAdherence)}>
-                            {trainee.scheduleAdherence}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={getStatusBadge(trainee.learningStatus)}>
-                            {trainee.learningStatus}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={getStatusBadge(trainee.interimStatus || "Pending")}>
-                            {trainee.interimStatus || "Pending"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={getStatusBadge(trainee.finalStatus || "Pending")}>
-                            {trainee.finalStatus || "Pending"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {trainee.qualifierScore !== null ? (
-                            <span className={`font-semibold ${trainee.qualifierScore >= 60 ? "text-success" : "text-destructive"}`}>
-                              {trainee.qualifierScore}%
-                            </span>
-                          ) : (
-                            <span className="text-muted-foreground">N/A</span>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={getStatusBadge(trainee.eligibility)}>
-                            {trainee.eligibility}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => handleAttendanceClick(e, trainee)}
-                            className="gap-1 hover:bg-primary/10 hover:text-primary transition-colors"
-                          >
-                            <Eye className="w-4 h-4" />
-                            View
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {filteredTrainees.map((trainee, index) => {
+                      const hasAttendance = hasAttendanceData(trainee.id);
+                      return (
+                        <TableRow
+                          key={trainee.id}
+                          className="cursor-pointer hover:bg-muted/50 animate-fade-in transition-colors"
+                          style={{ animationDelay: `${index * 0.03}s` }}
+                        >
+                          <TableCell>
+                            <button
+                              onClick={(e) => handleNameClick(e, trainee)}
+                              className="text-left hover:text-primary transition-colors"
+                            >
+                              <p className="font-medium hover:underline">{trainee.name}</p>
+                              <p className="text-xs text-muted-foreground">{trainee.email}</p>
+                            </button>
+                          </TableCell>
+                          <TableCell className="font-mono text-sm">{trainee.employeeId}</TableCell>
+                          <TableCell>
+                            <Badge className={getStatusBadge(trainee.scheduleAdherence)}>
+                              {trainee.scheduleAdherence}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge className={getStatusBadge(trainee.learningStatus)}>
+                              {trainee.learningStatus}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge className={getStatusBadge(trainee.interimStatus || "Pending")}>
+                              {trainee.interimStatus || "Pending"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge className={getStatusBadge(trainee.finalStatus || "Pending")}>
+                              {trainee.finalStatus || "Pending"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {trainee.qualifierScore !== null ? (
+                              <span className={`font-semibold ${trainee.qualifierScore >= 60 ? "text-success" : "text-destructive"}`}>
+                                {trainee.qualifierScore}%
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground">N/A</span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <Badge className={getStatusBadge(trainee.eligibility)}>
+                              {trainee.eligibility}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              variant={hasAttendance ? "default" : "outline"}
+                              size="sm"
+                              onClick={(e) => handleAttendanceClick(e, trainee)}
+                              disabled={!hasAttendance}
+                              className={`gap-1 transition-all ${
+                                hasAttendance 
+                                  ? 'bg-gradient-to-r from-success to-info text-white hover:opacity-90' 
+                                  : 'opacity-50 cursor-not-allowed'
+                              }`}
+                              title={hasAttendance ? "View attendance" : "No attendance recorded yet"}
+                            >
+                              <Eye className="w-4 h-4" />
+                              View
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </div>
             ) : (
-              <div className="text-center py-8 text-muted-foreground bg-muted/30 rounded-lg border border-dashed">
+              <div className="text-center py-8 text-muted-foreground bg-gradient-to-br from-muted/30 to-muted/10 rounded-lg border border-dashed">
                 {searchQuery ? "No trainees match your search" : "No trainees added yet. Upload an Excel file or add manually."}
               </div>
             )}
@@ -197,7 +208,7 @@ const TraineeListSection = ({ batchId, trainees, onAddTrainee }: TraineeListSect
           open={showAttendanceDialog}
           onOpenChange={setShowAttendanceDialog}
           traineeName={attendanceTrainee.name}
-          traineeId={attendanceTrainee.employeeId}
+          traineeId={attendanceTrainee.id}
           traineeEmail={attendanceTrainee.email}
         />
       )}

@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Calendar, Save, Eye } from "lucide-react";
+import { Calendar, Save } from "lucide-react";
 import { toast } from "sonner";
 import { Trainee } from "@/context/BatchContext";
+import { useAttendance } from "@/context/AttendanceContext";
 
 interface AttendanceSectionProps {
   batchId: string;
@@ -16,16 +16,16 @@ interface AttendanceSectionProps {
 }
 
 const AttendanceSection = ({ batchId, totalTrainees, trainees = [] }: AttendanceSectionProps) => {
-  const navigate = useNavigate();
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [absentIds, setAbsentIds] = useState<Set<string>>(new Set());
+  const { saveAttendance } = useAttendance();
 
-  // Use real trainees if available, otherwise generate placeholders
   const displayTrainees = trainees.length > 0 
-    ? trainees.map(t => ({ id: t.id, name: t.name }))
+    ? trainees.map(t => ({ id: t.id, name: t.name, email: t.email }))
     : Array.from({ length: totalTrainees }, (_, i) => ({
         id: `trainee-${i + 1}`,
         name: `Trainee ${i + 1}`,
+        email: `trainee${i + 1}@example.com`,
       }));
 
   const handleToggleAbsent = (traineeId: string) => {
@@ -41,77 +41,84 @@ const AttendanceSection = ({ batchId, totalTrainees, trainees = [] }: Attendance
   };
 
   const handleSaveAttendance = () => {
-    const presentCount = displayTrainees.length - absentIds.size;
-    const absentCount = absentIds.size;
+    const presentIds = displayTrainees.filter(t => !absentIds.has(t.id)).map(t => t.id);
+    const absentIdsList = Array.from(absentIds);
     
-    // Mock save - replace with actual API call later
-    toast.success(`Attendance saved! Present: ${presentCount}, Absent: ${absentCount}`);
+    saveAttendance(batchId, date, presentIds, absentIdsList, displayTrainees);
+    
+    const presentCount = presentIds.length;
+    const absentCount = absentIdsList.length;
+    
+    toast.success(`Attendance saved for ${date}! Present: ${presentCount}, Absent: ${absentCount}`);
+    setAbsentIds(new Set()); // Reset selection after save
   };
 
   return (
-    <Card className="animate-fade-in" style={{ animationDelay: "0.6s" }}>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <Card className="animate-fade-in border-l-4 border-l-primary" style={{ animationDelay: "0.6s" }}>
+      <CardHeader className="bg-gradient-to-r from-primary/10 via-info/5 to-transparent">
+        <CardTitle className="flex items-center gap-2 text-primary">
           <Calendar className="w-5 h-5" />
           Daily Attendance Management
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-4">
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="date">Date</Label>
+            <Label htmlFor="date" className="text-foreground font-medium">Date</Label>
             <Input
               id="date"
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="max-w-xs"
+              className="max-w-xs border-primary/30 focus:border-primary"
             />
           </div>
 
           <div className="space-y-2">
-            <Label>Mark Absent Trainees (Others will be marked present)</Label>
-            <div className="border rounded-lg p-4 max-h-96 overflow-y-auto">
+            <Label className="text-foreground font-medium">Mark Absent Trainees (Others will be marked present)</Label>
+            <div className="border rounded-lg p-4 max-h-96 overflow-y-auto bg-gradient-to-br from-muted/30 to-muted/10">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {displayTrainees.map((trainee, idx) => (
                   <div 
                     key={trainee.id} 
-                    className="flex items-center justify-between space-x-2 p-2 rounded-lg hover:bg-muted/50 transition-all animate-fade-in"
+                    className={`flex items-center space-x-2 p-3 rounded-lg transition-all animate-fade-in cursor-pointer ${
+                      absentIds.has(trainee.id) 
+                        ? 'bg-destructive/10 border border-destructive/30' 
+                        : 'hover:bg-success/10 border border-transparent hover:border-success/30'
+                    }`}
                     style={{ animationDelay: `${idx * 0.02}s` }}
+                    onClick={() => handleToggleAbsent(trainee.id)}
                   >
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id={trainee.id}
-                        checked={absentIds.has(trainee.id)}
-                        onCheckedChange={() => handleToggleAbsent(trainee.id)}
-                        className="transition-all"
-                      />
-                      <label
-                        htmlFor={trainee.id}
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                      >
-                        {trainee.name}
-                      </label>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => navigate(`/student/${trainee.id}`)}
-                      className="gap-1 h-7 text-xs hover:bg-primary/10 hover:text-primary transition-colors"
+                    <Checkbox
+                      id={trainee.id}
+                      checked={absentIds.has(trainee.id)}
+                      onCheckedChange={() => handleToggleAbsent(trainee.id)}
+                      className="transition-all"
+                    />
+                    <label
+                      htmlFor={trainee.id}
+                      className="text-sm font-medium leading-none cursor-pointer flex-1"
                     >
-                      <Eye className="w-3 h-3" />
-                      View
-                    </Button>
+                      {trainee.name}
+                    </label>
                   </div>
                 ))}
               </div>
             </div>
-            <p className="text-sm text-muted-foreground">
-              Present: {displayTrainees.length - absentIds.size} | Absent: {absentIds.size}
-            </p>
+            <div className="flex gap-4 text-sm">
+              <span className="px-3 py-1 rounded-full bg-success/10 text-success border border-success/20">
+                Present: {displayTrainees.length - absentIds.size}
+              </span>
+              <span className="px-3 py-1 rounded-full bg-destructive/10 text-destructive border border-destructive/20">
+                Absent: {absentIds.size}
+              </span>
+            </div>
           </div>
 
-          <Button onClick={handleSaveAttendance} className="gap-2">
+          <Button 
+            onClick={handleSaveAttendance} 
+            className="gap-2 bg-gradient-to-r from-primary to-info hover:opacity-90 transition-all"
+          >
             <Save className="w-4 h-4" />
             Save Attendance
           </Button>
