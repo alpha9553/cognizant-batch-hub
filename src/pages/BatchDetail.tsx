@@ -85,7 +85,7 @@ const BatchDetail = () => {
     addTrainee(batch.id, trainee);
   };
 
-  const handleAddTrainer = (trainerData: { name: string; type: string; category: "internal" | "external"; hourlyRate: number }) => {
+  const handleAddTrainer = (trainerData: { name: string; type: string; category: "internal" | "external" }) => {
     const trainerType = addTrainerDialog.type;
     const updates: Partial<typeof batch> = {};
     
@@ -95,6 +95,8 @@ const BatchDetail = () => {
       updates.behavioralTrainer = trainerData.name;
     } else if (trainerType === "mentor") {
       updates.mentor = trainerData.name;
+    } else if (trainerType === "buddyMentor") {
+      (updates as any).buddyMentor = trainerData.name;
     }
 
     if (batch.stakeholders) {
@@ -313,40 +315,6 @@ const BatchDetail = () => {
               </CardContent>
             </Card>
 
-            <Card className="animate-fade-in" style={{ animationDelay: "0.5s" }}>
-              <CardHeader className="bg-gradient-to-r from-info/5 to-transparent border-b">
-                <CardTitle>Quick Stats</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 pt-4">
-                <div className="flex justify-between items-center p-3 bg-gradient-to-r from-success/10 to-success/5 rounded-lg border border-success/20 transition-all hover:border-success/40">
-                  <span className="text-sm font-medium">On Schedule</span>
-                  <span className="text-2xl font-bold text-success">{batch.scheduleStatus.onSchedule}</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-gradient-to-r from-warning/10 to-warning/5 rounded-lg border border-warning/20 transition-all hover:border-warning/40">
-                  <span className="text-sm font-medium">Behind Schedule</span>
-                  <span className="text-2xl font-bold text-warning">{batch.scheduleStatus.behind}</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-gradient-to-r from-info/10 to-info/5 rounded-lg border border-info/20 transition-all hover:border-info/40">
-                  <span className="text-sm font-medium">Advanced</span>
-                  <span className="text-2xl font-bold text-info">{batch.scheduleStatus.advanced}</span>
-                </div>
-                <div className="pt-3 border-t">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium text-muted-foreground">Total Trainees</span>
-                    <span className="text-2xl font-bold">{batch.totalTrainees}</span>
-                  </div>
-                </div>
-                {batch.milestones.qualifier.completed && batch.qualifierScores && (
-                  <Button variant="outline" className="w-full mt-4 hover:border-primary hover:text-primary" onClick={() => setQualifierDialog(true)}>
-                    View Qualifier Scores
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Milestone Dates Section */}
-          <div className="mb-8">
             <MilestoneDatesSection batchId={batch.id} milestones={batch.milestones} />
           </div>
 

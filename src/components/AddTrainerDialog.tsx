@@ -10,7 +10,7 @@ import { toast } from "sonner";
 interface AddTrainerDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (trainer: { name: string; type: string; category: "internal" | "external"; hourlyRate: number }) => void;
+  onSave: (trainer: { name: string; type: string; category: "internal" | "external" }) => void;
   trainerType: "trainer" | "behavioralTrainer" | "mentor" | "buddyMentor";
 }
 
@@ -18,7 +18,6 @@ const AddTrainerDialog = ({ open, onOpenChange, onSave, trainerType }: AddTraine
   const [name, setName] = useState("");
   const [type, setType] = useState("");
   const [category, setCategory] = useState<"internal" | "external">("internal");
-  const [hourlyRate, setHourlyRate] = useState("");
 
   const trainerTypeLabels: Record<string, string> = {
     trainer: "Trainer",
@@ -36,23 +35,17 @@ const AddTrainerDialog = ({ open, onOpenChange, onSave, trainerType }: AddTraine
       toast.error("Please enter trainer type/specialization");
       return;
     }
-    if (!hourlyRate || isNaN(Number(hourlyRate))) {
-      toast.error("Please enter a valid hourly rate");
-      return;
-    }
 
     onSave({
       name: name.trim(),
       type: type.trim(),
       category,
-      hourlyRate: Number(hourlyRate),
     });
 
     toast.success(`${trainerTypeLabels[trainerType]} added successfully!`);
     setName("");
     setType("");
     setCategory("internal");
-    setHourlyRate("");
     onOpenChange(false);
   };
 
@@ -112,17 +105,6 @@ const AddTrainerDialog = ({ open, onOpenChange, onSave, trainerType }: AddTraine
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="rate">Hourly Rate (₹)</Label>
-            <Input
-              id="rate"
-              type="number"
-              placeholder="Enter hourly rate"
-              value={hourlyRate}
-              onChange={(e) => setHourlyRate(e.target.value)}
-              className="transition-all focus:ring-2 focus:ring-primary/20"
-            />
-          </div>
         </div>
 
         <DialogFooter>

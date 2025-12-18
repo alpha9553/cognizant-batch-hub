@@ -31,22 +31,21 @@ const AttendanceViewDialog = ({
   const attendanceRecords: AttendanceRecord[] = useMemo(() => {
     const records: AttendanceRecord[] = [];
     const today = new Date();
+    let daysBack = 0;
     
-    for (let i = 0; i < 10; i++) {
+    while (records.length < 10) {
       const date = new Date(today);
-      date.setDate(date.getDate() - i);
+      date.setDate(date.getDate() - daysBack);
+      daysBack++;
       // Skip weekends
       if (date.getDay() !== 0 && date.getDay() !== 6) {
         records.push({
           date: date.toISOString().split("T")[0],
           status: Math.random() > 0.15 ? "present" : "absent",
         });
-      } else {
-        // Add extra day to compensate for weekend
-        i--;
       }
     }
-    return records.slice(0, 10);
+    return records;
   }, [traineeId]);
 
   const presentCount = attendanceRecords.filter(r => r.status === "present").length;
