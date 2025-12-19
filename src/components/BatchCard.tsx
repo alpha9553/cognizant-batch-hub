@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Users, TrendingDown, TrendingUp, User, GraduationCap, CheckCircle, Circle, Building2, MapPin, BookOpen } from "lucide-react";
+import { Users, TrendingDown, TrendingUp, User, GraduationCap, CheckCircle, Circle, Building2, MapPin, BookOpen, ExternalLink, Home } from "lucide-react";
 import QualifierDialog from "./QualifierDialog";
 import { Batch } from "@/context/BatchContext";
 
@@ -26,14 +26,39 @@ const BatchCard = ({ batch, index }: BatchCardProps) => {
     }
   };
 
+  // Get trainer category from stakeholders
+  const getTrainerCategory = (type: 'trainer' | 'behavioralTrainer' | 'mentor') => {
+    // Check if we have category info in stakeholders (can be extended)
+    const stakeholder = batch.stakeholders?.[type];
+    // Default to internal if not specified - in a real app this would come from data
+    return (stakeholder as any)?.category || "internal";
+  };
+
+  const TrainerBadge = ({ category }: { category: string }) => (
+    <Badge 
+      variant="outline" 
+      className={`text-[10px] px-1.5 py-0 ${
+        category === "external" 
+          ? "bg-accent/10 text-accent border-accent/30" 
+          : "bg-primary/10 text-primary border-primary/30"
+      }`}
+    >
+      {category === "external" ? (
+        <><ExternalLink className="w-2.5 h-2.5 mr-0.5" />Ext</>
+      ) : (
+        <><Home className="w-2.5 h-2.5 mr-0.5" />Int</>
+      )}
+    </Badge>
+  );
+
   return (
     <>
       <Card 
-        className="hover:shadow-lg transition-all duration-300 cursor-pointer hover-scale animate-fade-in group"
+        className="hover:shadow-lg transition-all duration-300 cursor-pointer hover-scale animate-fade-in group colorful-shadow"
         style={{ animationDelay: `${index * 0.1}s` }}
         onClick={() => navigate(`/batch/${batch.id}`)}
       >
-        <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent border-b border-primary/10">
+        <CardHeader className="bg-gradient-to-r from-primary/10 via-info/5 to-accent/5 border-b border-primary/10">
           <CardTitle className="flex items-center justify-between">
             <span className="flex items-center gap-2">
               {batch.name}
@@ -68,7 +93,7 @@ const BatchCard = ({ batch, index }: BatchCardProps) => {
             </div>
           )}
 
-          <div className="flex items-center justify-between text-sm p-3 bg-gradient-to-r from-primary/5 to-transparent rounded-lg">
+          <div className="flex items-center justify-between text-sm p-3 bg-gradient-to-r from-primary/5 to-info/5 rounded-lg">
             <span className="text-muted-foreground">Total Trainees</span>
             <span className="text-2xl font-bold text-primary">{batch.totalTrainees}</span>
           </div>
@@ -95,7 +120,7 @@ const BatchCard = ({ batch, index }: BatchCardProps) => {
           <Progress value={behindPercent} className="h-2" />
         </div>
 
-        <div className="pt-2 border-t grid grid-cols-3 gap-2 text-center text-sm">
+        <div className="pt-2 border-t grid grid-cols-2 gap-2 text-center text-sm">
           <div className="p-2 rounded-lg bg-success/5 border border-success/10 transition-all hover:bg-success/10">
             <p className="text-muted-foreground text-xs">On Track</p>
             <p className="text-lg font-bold text-success">{batch.scheduleStatus.onSchedule}</p>
@@ -104,27 +129,26 @@ const BatchCard = ({ batch, index }: BatchCardProps) => {
             <p className="text-muted-foreground text-xs">Behind</p>
             <p className="text-lg font-bold text-warning">{batch.scheduleStatus.behind}</p>
           </div>
-          <div className="p-2 rounded-lg bg-info/5 border border-info/10 transition-all hover:bg-info/10">
-            <p className="text-muted-foreground text-xs">Advanced</p>
-            <p className="text-lg font-bold text-info">{batch.scheduleStatus.advanced}</p>
-          </div>
         </div>
 
         <div className="pt-3 space-y-2 text-xs">
-          <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-muted/50 transition-colors">
+          <div className="flex items-center gap-2 p-2 rounded-lg bg-gradient-to-r from-primary/5 to-transparent hover:from-primary/10 transition-colors">
             <User className="w-3 h-3 text-primary" />
             <span className="text-muted-foreground">Trainer:</span>
-            <span className="font-medium">{batch.trainer}</span>
+            <span className="font-medium flex-1">{batch.trainer}</span>
+            <TrainerBadge category={getTrainerCategory('trainer')} />
           </div>
-          <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-muted/50 transition-colors">
+          <div className="flex items-center gap-2 p-2 rounded-lg bg-gradient-to-r from-info/5 to-transparent hover:from-info/10 transition-colors">
             <User className="w-3 h-3 text-info" />
             <span className="text-muted-foreground">BH Trainer:</span>
-            <span className="font-medium">{batch.behavioralTrainer}</span>
+            <span className="font-medium flex-1">{batch.behavioralTrainer}</span>
+            <TrainerBadge category={getTrainerCategory('behavioralTrainer')} />
           </div>
-          <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-muted/50 transition-colors">
+          <div className="flex items-center gap-2 p-2 rounded-lg bg-gradient-to-r from-success/5 to-transparent hover:from-success/10 transition-colors">
             <User className="w-3 h-3 text-success" />
             <span className="text-muted-foreground">Mentor:</span>
-            <span className="font-medium">{batch.mentor}</span>
+            <span className="font-medium flex-1">{batch.mentor}</span>
+            <TrainerBadge category={getTrainerCategory('mentor')} />
           </div>
         </div>
 

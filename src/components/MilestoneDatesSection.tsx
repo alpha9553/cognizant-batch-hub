@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Flag, Edit, Save, X, CheckCircle2, Clock, Calendar } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Flag, Edit, Save, X, CheckCircle2, Clock, Calendar as CalendarIcon } from "lucide-react";
+import { format, isValid, parse } from "date-fns";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 interface Milestone {
@@ -53,19 +56,53 @@ const MilestoneDatesSection = ({ batchId, milestones, onUpdateMilestones }: Mile
   ]);
 
   const [editForm, setEditForm] = useState({ date: "", message: "" });
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+
+  const parseDate = (dateStr: string): Date | undefined => {
+    if (!dateStr) return undefined;
+    
+    // Try parsing common formats
+    const formats = ["yyyy-MM-dd", "MMM dd, yyyy", "dd-MM-yyyy", "MM/dd/yyyy"];
+    for (const fmt of formats) {
+      const parsed = parse(dateStr, fmt, new Date());
+      if (isValid(parsed)) return parsed;
+    }
+    
+    // Try native parsing
+    const nativeParsed = new Date(dateStr);
+    if (isValid(nativeParsed)) return nativeParsed;
+    
+    return undefined;
+  };
 
   const handleEdit = (milestone: Milestone) => {
     setEditingId(milestone.id);
     setEditForm({ date: milestone.date, message: milestone.message });
+    setSelectedDate(parseDate(milestone.date));
+  };
+
+  const handleDateSelect = (date: Date | undefined) => {
+    setSelectedDate(date);
+    if (date) {
+      setEditForm(prev => ({ ...prev, date: format(date, "MMM dd, yyyy") }));
+    }
   };
 
   const handleSave = (id: string) => {
+    if (!selectedDate && !editForm.date) {
+      toast.error("Please select a valid date");
+      return;
+    }
+
+    const finalDate = selectedDate ? format(selectedDate, "MMM dd, yyyy") : editForm.date;
+    
     setMilestoneData(prev =>
       prev.map(m =>
-        m.id === id ? { ...m, date: editForm.date, message: editForm.message } : m
+        m.id === id ? { ...m, date: finalDate, message: editForm.message } : m
       )
     );
     setEditingId(null);
+    setSelectedDate(undefined);
     toast.success("Milestone updated successfully!");
     onUpdateMilestones?.(milestoneData);
   };
@@ -73,6 +110,7 @@ const MilestoneDatesSection = ({ batchId, milestones, onUpdateMilestones }: Mile
   const handleCancel = () => {
     setEditingId(null);
     setEditForm({ date: "", message: "" });
+    setSelectedDate(undefined);
   };
 
   const getMilestoneColor = (completed: boolean, index: number) => {
@@ -121,16 +159,32 @@ const MilestoneDatesSection = ({ batchId, milestones, onUpdateMilestones }: Mile
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">
                       <Label className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        Date
+                        <CalendarIcon className="w-4 h-4" />
+                        Select Date
                       </Label>
-                      <Input
-                        type="text"
-                        placeholder="e.g., Mar 15, 2024"
-                        value={editForm.date}
-                        onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
-                        className="transition-all focus:ring-2 focus:ring-primary/20"
-                      />
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal",
+                              !selectedDate && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={selectedDate}
+                            onSelect={handleDateSelect}
+                            initialFocus
+                            className={cn("p-3 pointer-events-auto")}
+                          />
+                        </PopoverContent>
+                      </Popover>
                     </div>
                     <div className="space-y-2">
                       <Label>Message</Label>
@@ -167,8 +221,8 @@ const MilestoneDatesSection = ({ batchId, milestones, onUpdateMilestones }: Mile
                         </Badge>
                       </div>
                       <p className="text-sm text-muted-foreground flex items-center gap-1 mb-1">
-                        <Calendar className="w-3 h-3" />
-                        {milestone.date}
+                        <CalendarIcon className="w-3 h-3" />
+                        {milestone.date || "Not set"}
                       </p>
                       <p className="text-sm text-foreground/80">{milestone.message}</p>
                     </div>

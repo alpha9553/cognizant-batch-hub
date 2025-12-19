@@ -17,6 +17,34 @@ interface TraineeListSectionProps {
   onAddTrainee: (trainee: Trainee) => void;
 }
 
+// Helper function to get grade color
+const getGradeColor = (grade: string | undefined): string => {
+  if (!grade) return "";
+  const lowerGrade = grade.toLowerCase().trim();
+  
+  if (lowerGrade === "green" || lowerGrade === "g") {
+    return "bg-green-500/20 text-green-600 border-green-500/30";
+  }
+  if (lowerGrade === "amber" || lowerGrade === "a" || lowerGrade === "orange") {
+    return "bg-orange-500/20 text-orange-600 border-orange-500/30";
+  }
+  if (lowerGrade === "red" || lowerGrade === "r") {
+    return "bg-red-500/20 text-red-600 border-red-500/30";
+  }
+  // For any other value, show as N/A with neutral styling
+  return "bg-muted text-muted-foreground border-border";
+};
+
+const getDisplayGrade = (grade: string | undefined): string => {
+  if (!grade) return "N/A";
+  const lowerGrade = grade.toLowerCase().trim();
+  
+  if (["green", "g", "amber", "a", "orange", "red", "r"].includes(lowerGrade)) {
+    return grade.charAt(0).toUpperCase() + grade.slice(1);
+  }
+  return "N/A";
+};
+
 const TraineeListSection = ({ batchId, trainees, onAddTrainee }: TraineeListSectionProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showAddDialog, setShowAddDialog] = useState(false);
@@ -63,7 +91,7 @@ const TraineeListSection = ({ batchId, trainees, onAddTrainee }: TraineeListSect
   return (
     <>
       <Card className="animate-fade-in overflow-hidden border-l-4 border-l-info">
-        <CardHeader className="bg-gradient-to-r from-info/10 via-primary/5 to-transparent border-b">
+        <CardHeader className="bg-gradient-to-r from-info/10 via-primary/5 to-accent/5 border-b">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-info">
               <Users className="w-5 h-5" />
@@ -98,7 +126,7 @@ const TraineeListSection = ({ batchId, trainees, onAddTrainee }: TraineeListSect
               <div className="rounded-md border overflow-hidden">
                 <Table>
                   <TableHeader>
-                    <TableRow className="bg-gradient-to-r from-muted/80 to-muted/40">
+                    <TableRow className="bg-gradient-to-r from-muted/80 via-primary/5 to-muted/40">
                       <TableHead>Name</TableHead>
                       <TableHead>Employee ID</TableHead>
                       <TableHead>Schedule Status</TableHead>
@@ -140,13 +168,13 @@ const TraineeListSection = ({ batchId, trainees, onAddTrainee }: TraineeListSect
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            <Badge className={getStatusBadge(trainee.interimStatus || "Pending")}>
-                              {trainee.interimStatus || "Pending"}
+                            <Badge className={`border ${getGradeColor(trainee.interimStatus)}`}>
+                              {getDisplayGrade(trainee.interimStatus)}
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            <Badge className={getStatusBadge(trainee.finalStatus || "Pending")}>
-                              {trainee.finalStatus || "Pending"}
+                            <Badge className={`border ${getGradeColor(trainee.finalStatus)}`}>
+                              {getDisplayGrade(trainee.finalStatus)}
                             </Badge>
                           </TableCell>
                           <TableCell>
