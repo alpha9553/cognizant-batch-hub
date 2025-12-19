@@ -11,11 +11,11 @@ interface ProgressChartProps {
 }
 
 const ProgressChart = ({ data }: ProgressChartProps) => {
+  // Only show On Schedule and Behind Schedule (no Advanced)
   const chartData = [
     { name: "On Schedule", value: data.onSchedule, color: "hsl(var(--success))" },
     { name: "Behind Schedule", value: data.behind, color: "hsl(var(--warning))" },
-    { name: "Advanced", value: data.advanced, color: "hsl(var(--info))" },
-  ];
+  ].filter(item => item.value > 0); // Only show if value > 0
 
   return (
     <ResponsiveContainer width="100%" height={300}>
