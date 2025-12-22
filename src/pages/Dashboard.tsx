@@ -9,7 +9,11 @@ import cognizantLogo from "@/assets/cognizant-logo.png";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+<<<<<<< HEAD
   const { batches, saveBatchesToDatabase, isLoading } = useBatches();
+=======
+  const { batches, setBatches } = useBatches();
+>>>>>>> 6cabe94d540bb7a887e3f2d54a60383c4ada14d7
 
   useEffect(() => {
     const isAuth = localStorage.getItem("isAuthenticated");
@@ -26,8 +30,13 @@ const Dashboard = () => {
 
   const coachEmail = localStorage.getItem("coachEmail");
 
+<<<<<<< HEAD
   const handleDataParsed = async (newBatches: Batch[]) => {
     await saveBatchesToDatabase(newBatches);
+=======
+  const handleDataParsed = (newBatches: Batch[]) => {
+    setBatches(newBatches);
+>>>>>>> 6cabe94d540bb7a887e3f2d54a60383c4ada14d7
   };
 
   return (
@@ -54,6 +63,7 @@ const Dashboard = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
+<<<<<<< HEAD
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -109,6 +119,54 @@ const Dashboard = () => {
             </div>
           </>
         )}
+=======
+        <div className="mb-8 animate-fade-in" style={{ animationDelay: "0.1s" }}>
+          <h2 className="text-3xl font-bold text-foreground mb-2 gradient-text">Your Batches</h2>
+          <p className="text-muted-foreground">
+            Manage and monitor all your assigned training batches
+          </p>
+        </div>
+
+        <div className="animate-fade-in" style={{ animationDelay: "0.2s" }}>
+          <ExcelUpload onDataParsed={handleDataParsed} />
+        </div>
+
+        {/* Ongoing Training Batches */}
+        <div className="mb-12 animate-fade-in" style={{ animationDelay: "0.3s" }}>
+          <h3 className="text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-gradient-to-r from-primary to-accent animate-pulse-glow" />
+            Ongoing Training
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {batches.filter(b => b.status !== "graduated").map((batch, index) => (
+              <BatchCard key={batch.id} batch={batch} index={index} />
+            ))}
+          </div>
+          {batches.filter(b => b.status !== "graduated").length === 0 && (
+            <div className="text-center py-12 text-muted-foreground bg-gradient-to-br from-muted/30 to-muted/10 rounded-xl border border-dashed border-border">
+              <p>No ongoing training batches</p>
+            </div>
+          )}
+        </div>
+
+        {/* Graduated Batches */}
+        <div className="animate-fade-in" style={{ animationDelay: "0.4s" }}>
+          <h3 className="text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-gradient-to-r from-success to-info" />
+            Graduated Batches
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {batches.filter(b => b.status === "graduated").map((batch, index) => (
+              <BatchCard key={batch.id} batch={batch} index={index} />
+            ))}
+          </div>
+          {batches.filter(b => b.status === "graduated").length === 0 && (
+            <div className="text-center py-12 text-muted-foreground bg-gradient-to-br from-muted/30 to-muted/10 rounded-xl border border-dashed border-border">
+              <p>No graduated batches yet</p>
+            </div>
+          )}
+        </div>
+>>>>>>> 6cabe94d540bb7a887e3f2d54a60383c4ada14d7
       </main>
     </div>
   );

@@ -8,9 +8,13 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
+<<<<<<< HEAD
     "preview": "vite preview",
     "init-db": "node scripts/init-db.js",
     "server": "cd server && npm install && npm start"
+=======
+    "preview": "vite preview"
+>>>>>>> 6cabe94d540bb7a887e3f2d54a60383c4ada14d7
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -63,8 +67,11 @@
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.9",
     "xlsx": "^0.18.5",
+<<<<<<< HEAD
     "mysql2": "^3.11.4",
     "dotenv": "^16.4.7",
+=======
+>>>>>>> 6cabe94d540bb7a887e3f2d54a60383c4ada14d7
     "zod": "^3.25.76"
   },
   "devDependencies": {

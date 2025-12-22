@@ -44,7 +44,11 @@ const ExcelUpload = ({ onDataParsed }: ExcelUploadProps) => {
           onDataParsed(parsedBatches);
           toast({
             title: "Upload Successful",
+<<<<<<< HEAD
             description: `${parsedBatches.length} batches updated from ${file.name}. Existing batches preserved.`,
+=======
+            description: `${parsedBatches.length} batches loaded from ${file.name}`,
+>>>>>>> 6cabe94d540bb7a887e3f2d54a60383c4ada14d7
           });
         } else {
           toast({

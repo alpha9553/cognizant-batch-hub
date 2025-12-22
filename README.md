@@ -1,8 +1,14 @@
 # Cognizant Coach Dashboard
 
+<<<<<<< HEAD
 A modern dashboard for Cognizant coaches to manage training batches, track trainee progress, attendance, and performance with MySQL database integration.
 
 ## 🚀 Features
+=======
+A modern dashboard for Cognizant coaches to manage training batches, track trainee progress, attendance, and performance.
+
+## Features
+>>>>>>> 6cabe94d540bb7a887e3f2d54a60383c4ada14d7
 
 - 📊 **Batch Management**: View and manage ongoing and graduated training batches
 - 📈 **Progress Tracking**: Pie charts showing trainee schedule status distribution
@@ -11,6 +17,7 @@ A modern dashboard for Cognizant coaches to manage training batches, track train
 - 👤 **Student Details**: View complete student information including scores and attendance
 - 💰 **Stakeholder Tracking**: Track trainer/mentor hours and payouts
 - 🏆 **Qualifier Scores**: View batch qualifier performance metrics
+<<<<<<< HEAD
 - 🗄️ **MySQL Integration**: Persistent data storage with smart merging
 
 ## 🛠️ Tech Stack
@@ -20,6 +27,8 @@ A modern dashboard for Cognizant coaches to manage training batches, track train
 - **Backend**: Node.js + Express
 - **Database**: MySQL
 - **Excel Processing**: XLSX library
+=======
+>>>>>>> 6cabe94d540bb7a887e3f2d54a60383c4ada14d7
 
 ---
 
@@ -29,23 +38,41 @@ A modern dashboard for Cognizant coaches to manage training batches, track train
 
 Make sure you have the following installed:
 - **Node.js** (v18 or higher) - [Download here](https://nodejs.org/)
+<<<<<<< HEAD
 - **npm** (comes with Node.js)
 - **MySQL Server** - [Download XAMPP](https://www.apachefriends.org/) (easiest option)
+=======
+- **npm** (comes with Node.js) or **bun**
+>>>>>>> 6cabe94d540bb7a887e3f2d54a60383c4ada14d7
 - **VS Code** - [Download here](https://code.visualstudio.com/)
 
 ### Step-by-Step Setup
 
 1. **Clone the repository**
    ```bash
+<<<<<<< HEAD
    git clone https://github.com/alpha9553/cognizant-batch-hub.git
    cd cognizant-batch-hub
    ```
 
 2. **Install frontend dependencies**
+=======
+   git clone <your-repo-url>
+   cd <project-folder>
+   ```
+
+2. **Open in VS Code**
+   ```bash
+   code .
+   ```
+
+3. **Install dependencies**
+>>>>>>> 6cabe94d540bb7a887e3f2d54a60383c4ada14d7
    ```bash
    npm install
    ```
 
+<<<<<<< HEAD
 3. **Install backend dependencies**
    ```bash
    cd server
@@ -71,13 +98,21 @@ Make sure you have the following installed:
    ```
 
 6. **Start the frontend** (in another terminal)
+=======
+4. **Start the development server**
+>>>>>>> 6cabe94d540bb7a887e3f2d54a60383c4ada14d7
    ```bash
    npm run dev
    ```
 
+<<<<<<< HEAD
 7. **Open in browser**
    - Frontend: `http://localhost:8081`
    - Backend API: `http://localhost:3001`
+=======
+5. **Open in browser**
+   - The app will be available at `http://localhost:5173`
+>>>>>>> 6cabe94d540bb7a887e3f2d54a60383c4ada14d7
    - Login with any email/password to access the dashboard
 
 ### Recommended VS Code Extensions
@@ -98,6 +133,7 @@ Make sure you have the following installed:
 
 See `EXCEL_TEMPLATE.md` for the required Excel file format.
 
+<<<<<<< HEAD
 ### MySQL Database Integration
 
 The application now uses MySQL to store data locally. When you upload Excel files:
@@ -107,6 +143,8 @@ The application now uses MySQL to store data locally. When you upload Excel file
 
 See `MYSQL_SETUP.md` for database setup instructions.
 
+=======
+>>>>>>> 6cabe94d540bb7a887e3f2d54a60383c4ada14d7
 ---
 
 ## Project Structure

@@ -1,7 +1,12 @@
+<<<<<<< HEAD
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { mockBatches } from "@/lib/mockData";
 import { saveBatchesToAPI, loadBatchesFromAPI } from "@/lib/api";
 import { saveBatchesToStorage, loadBatchesFromStorage } from "@/lib/localStorage";
+=======
+import { createContext, useContext, useState, ReactNode } from "react";
+import { mockBatches } from "@/lib/mockData";
+>>>>>>> 6cabe94d540bb7a887e3f2d54a60383c4ada14d7
 
 export interface Trainee {
   id: string;
@@ -62,8 +67,11 @@ export interface Batch {
 interface BatchContextType {
   batches: Batch[];
   setBatches: (batches: Batch[]) => void;
+<<<<<<< HEAD
   saveBatchesToDatabase: (batches: Batch[]) => Promise<void>;
   isLoading: boolean;
+=======
+>>>>>>> 6cabe94d540bb7a887e3f2d54a60383c4ada14d7
   updateBatch: (batchId: string, updates: Partial<Batch>) => void;
   getBatchById: (batchId: string) => Batch | undefined;
   addTrainee: (batchId: string, trainee: Trainee) => void;
@@ -74,6 +82,7 @@ interface BatchContextType {
 const BatchContext = createContext<BatchContextType | undefined>(undefined);
 
 export const BatchProvider = ({ children }: { children: ReactNode }) => {
+<<<<<<< HEAD
   const [batches, setBatches] = useState<Batch[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -133,6 +142,9 @@ export const BatchProvider = ({ children }: { children: ReactNode }) => {
       }
     }
   };
+=======
+  const [batches, setBatches] = useState<Batch[]>(mockBatches as Batch[]);
+>>>>>>> 6cabe94d540bb7a887e3f2d54a60383c4ada14d7
 
   const updateBatch = (batchId: string, updates: Partial<Batch>) => {
     setBatches((prev) =>
@@ -198,8 +210,11 @@ export const BatchProvider = ({ children }: { children: ReactNode }) => {
       value={{
         batches,
         setBatches,
+<<<<<<< HEAD
         saveBatchesToDatabase,
         isLoading,
+=======
+>>>>>>> 6cabe94d540bb7a887e3f2d54a60383c4ada14d7
         updateBatch,
         getBatchById,
         addTrainee,
